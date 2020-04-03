@@ -6,9 +6,8 @@ import { UserModel } from '../types/user-model';
 
 export const fetchUsers = createEffect({
     handler: async (data: { loginTerm: string, authToken: string }) => {
-        console.log(data);
         const searchLimit = 5;
-        const url = `http://localhost:8080/users?search=${data.loginTerm}&limit=${searchLimit}`;
+        const url = `http://localhost:8080/users?login=${data.loginTerm}&limit=${searchLimit}`;
         const request = await fetch(url, {
             headers: {
                 'x-access-token': data.authToken
@@ -29,5 +28,5 @@ $users.on(fetchUsers.doneData, (_, users) => users)
 export const $usersProjection = $users.map(
     (users) => users
         .filter((user) => !user.isDeleted)
-        .map(({ login, age }) => ({ login, age }))
+        .map(({ id, login, age }) => ({ id, login, age }))
 );

@@ -1,22 +1,29 @@
-import React, { useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useStore } from 'effector-react';
 
 import { $usersProjection, fetchUsers } from '../../stores/users-store';
 import { $token } from '../../stores/auth';
 
+import styles from './Users.module.css';
+
 const Users: React.FC = () => {
     const authToken = useStore($token);
     const users = useStore($usersProjection);
 
-    useEffect(() => {
-        // TODO: почему-то fetch возвращает пустой массив всегда
-        fetchUsers({ loginTerm: 'starky' , authToken });
-    }, [authToken]);
+    const [searchValue, changeSearchValue] = useState('');
+
+    const handleSearch = useCallback(() => {
+        fetchUsers({ loginTerm: searchValue , authToken });
+    }, [searchValue, authToken]);
 
     return (
         <>
-            { users.map((user) => (
-                <div>{ user.login } at age {user.age}</div>
+            <div className={ styles.searchContainer }>
+                <input value={ searchValue } onChange={ (e) => changeSearchValue(e.currentTarget.value)} />
+                <button onClick={ handleSearch }>Search</button>
+            </div>
+            { users.map(({ id, login, age}) => (
+                <div key={id}>{ login } at age {age}</div>
             )) }
         </>
     );
