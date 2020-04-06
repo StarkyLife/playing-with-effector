@@ -1,12 +1,30 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
+
 import App from './components/App/App';
+import Users from './components/Users/Users';
+
+import { RoutesPaths } from './utils/routes-constants';
+
 import * as serviceWorker from './serviceWorker';
+import './index.css';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <Switch>
+        <Route
+          path={ RoutesPaths.BASE }
+          exact={ true }
+          render={ ({ history }) => <App history={ history } />}
+        />
+        <Route
+          path={ RoutesPaths.USERS_LIST }
+          render={ () => <Users /> }
+        />
+      </Switch>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')
 );
