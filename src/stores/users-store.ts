@@ -4,8 +4,8 @@ import { UserModel } from '../types/user-model';
 
 /* Effects */
 
-export const fetchUsers = createEffect({
-    handler: async (data: { loginTerm: string, authToken: string }) => {
+export const fetchUsers = createEffect<{ loginTerm: string, authToken: string }, UserModel[]>({
+    handler: async (data) => {
         const searchLimit = 5;
         const url = `http://localhost:8080/users?login=${data.loginTerm}&limit=${searchLimit}`;
         const request = await fetch(url, {
@@ -21,7 +21,7 @@ export const fetchUsers = createEffect({
 /* Store */
 
 export const $users = createStore<UserModel[]>([]);
-$users.on(fetchUsers.doneData, (_, users) => users)
+$users.on(fetchUsers.doneData, (_, users) => users);
 
 /* Projections */
 
