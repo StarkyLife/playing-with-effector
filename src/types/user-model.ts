@@ -5,3 +5,5 @@ export interface UserModel {
     age: number;
     isDeleted: boolean;
 }
+
+export type UserFormValues = Pick<UserModel, 'login' | 'password' | 'age'>;

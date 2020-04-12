@@ -4,6 +4,8 @@ import { useStore } from 'effector-react';
 import { $usersProjection, fetchUsers } from '../../stores/users-store';
 import { $token } from '../../stores/auth';
 
+import UserForm from '../UserForm/UserForm';
+
 import styles from './Users.module.css';
 
 const Users: React.FC = () => {
@@ -25,6 +27,7 @@ const Users: React.FC = () => {
             { users.map(({ id, login, age}) => (
                 <div key={id}>{ login } at age {age}</div>
             )) }
+            <UserForm />
         </>
     );
 }
