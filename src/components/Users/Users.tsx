@@ -1,22 +1,20 @@
 import React, { useState, useCallback } from 'react';
 import { useStore } from 'effector-react';
 
-import { $usersProjection, fetchUsers } from '../../stores/users-store';
-import { $token } from '../../stores/auth';
+import { $usersProjection, getUsers } from '../../stores/users-store';
 
 import UserForm from '../UserForm/UserForm';
 
 import styles from './Users.module.css';
 
 const Users: React.FC = () => {
-    const authToken = useStore($token);
     const users = useStore($usersProjection);
 
     const [searchValue, changeSearchValue] = useState('');
 
     const handleSearch = useCallback(() => {
-        fetchUsers({ loginTerm: searchValue , authToken });
-    }, [searchValue, authToken]);
+        getUsers({ loginTerm: searchValue });
+    }, [searchValue]);
 
     return (
         <>

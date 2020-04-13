@@ -1,20 +1,28 @@
-import { createStore, createEffect } from 'effector';
+import { createStore, createEffect, attach } from 'effector';
 
 import { GroupModel } from '../types/group-model';
 
+import { $token } from './auth';
+
 /* Effects */
 
-export const fetchGroups = createEffect<{ authToken: string }, GroupModel[]>({
-    handler: async (data) => {
-        const url = 'http://localhost:8080/groups';
-        const request = await fetch(url, {
-            headers: {
-                'x-access-token': data.authToken
-            }
-        });
+export const fetchGroups = attach({
+    effect: createEffect<{ authToken: string }, GroupModel[]>({
+        handler: async (data) => {
+            const url = 'http://localhost:8080/groups';
+            const request = await fetch(url, {
+                headers: {
+                    'x-access-token': data.authToken
+                }
+            });
 
-        return request.json();
-    }
+            return request.json();
+        }
+    }),
+    source: $token,
+    mapParams: (_, token) => ({
+        authToken: token
+    })
 });
 
 /* Store */

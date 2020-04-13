@@ -1,59 +1,67 @@
-import { createStore, createEffect } from 'effector';
+import { createStore, createEffect, attach } from 'effector';
 
 import { UserModel, UserFormValues } from '../types/user-model';
 
+import { $token } from './auth';
+
 /* Effects */
 
-export const fetchUsers = createEffect<{ loginTerm: string, authToken: string }, UserModel[]>({
-    handler: async (data) => {
-        const searchLimit = 5;
-        const url = `http://localhost:8080/users?login=${data.loginTerm}&limit=${searchLimit}`;
-        const request = await fetch(url, {
-            headers: {
-                'x-access-token': data.authToken
-            }
-        });
+export const getUsers = attach({
+    effect: createEffect<{ loginTerm: string, authToken: string }, UserModel[]>({
+        handler: async (data) => {
+            const searchLimit = 5;
+            const url = `http://localhost:8080/users?login=${data.loginTerm}&limit=${searchLimit}`;
+            const request = await fetch(url, {
+                headers: {
+                    'x-access-token': data.authToken
+                }
+            });
 
-        return request.json();
-    }
+            return request.json();
+        }
+    }),
+    source: $token,
+    mapParams: (
+        params: { loginTerm: string },
+        token
+    ) => ({ loginTerm: params.loginTerm, authToken: token })
 });
 
 // new user
 
-const sendNewUser = createEffect<{ user: Partial<UserModel>, authToken: string }, UserModel>({
-    handler: async (data) => {
-        const url = 'http://localhost:8080/users';
-        const request = await fetch(url, {
-            method: 'POST',
-            body: JSON.stringify(data.user),
-            headers: {
-                'Content-Type': 'application/json',
-                'x-access-token': data.authToken
-            }
-        });
+export const createNewUser = attach({
+    effect: createEffect<{ user: Partial<UserModel>, authToken: string }, UserModel>({
+        handler: async (data) => {
+            const url = 'http://localhost:8080/users';
+            const request = await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(data.user),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-access-token': data.authToken
+                }
+            });
 
-        return request.json();
-    }
-});
-
-export const createNewUser = sendNewUser.prepend<UserFormValues & { authToken: string }>(
-    ({ login, password, age, authToken }) => ({
+            return request.json();
+        }
+    }),
+    source: $token,
+    mapParams: ({ login, password, age }: UserFormValues, token) => ({
         user: {
             login,
             password,
             age,
             isDeleted: false
         },
-        authToken
+        authToken: token
     })
-);
-
+});
 
 /* Store */
 
 export const $users = createStore<UserModel[]>([]);
-$users.on(fetchUsers.doneData, (_, users) => users);
-$users.on(sendNewUser.doneData, (_, user) => [user])
+$users.on(getUsers.doneData, (_, users) => users);
+$users.on(createNewUser.doneData, (_, user) => [user])
 
 /* Projections */
 

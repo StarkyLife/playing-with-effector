@@ -3,7 +3,7 @@ import { createStore, createEffect } from 'effector';
 /* Effects */
 
 export const login = createEffect({
-    async handler() {
+    async handler(): Promise<{ token: string }> {
         const url = 'http://localhost:8080/login';
         const request = await fetch(url, {
             method: 'POST',
