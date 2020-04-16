@@ -7,3 +7,5 @@ export interface GroupModel {
     name: string;
     permissions: Array<Permissions>;
 }
+
+export type GroupFormValues = Pick<GroupModel, 'name'> & Record<Permissions, string>;

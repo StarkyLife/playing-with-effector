@@ -50,7 +50,7 @@ export const createNewUser = attach({
         user: {
             login,
             password,
-            age,
+            age: +age,
             isDeleted: false
         },
         authToken: token

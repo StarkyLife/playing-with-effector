@@ -3,6 +3,8 @@ import { useStore } from 'effector-react';
 
 import { fetchGroups, $groupsProjection } from '../../stores/groups-store';
 
+import GroupForm from '../GroupForm/GroupForm';
+
 import styles from './Groups.module.css'
 
 const Groups: React.FC = () => {
@@ -19,6 +21,8 @@ const Groups: React.FC = () => {
                     { group.name } - { group.permissions }
                 </div>
             )) }
+            <hr />
+            <GroupForm />
         </div>
     );
 };

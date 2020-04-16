@@ -1,45 +1,42 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
+import { useForm } from 'react-hook-form';
+
+import { UserFormValues } from '../../types/user-model';
 
 import { createNewUser } from '../../stores/users-store';
 
+const fieldsDefaults: UserFormValues = {
+    login: '',
+    password: '',
+    age: ''
+};
+
 const UserForm: React.FC = () => {
-    const [login, setLogin] = useState('');
-    const [password, setPassword] = useState('');
-    const [age, setAge] = useState(0);
+    const { register, handleSubmit, reset } = useForm<UserFormValues>({ defaultValues: fieldsDefaults });
 
-    const getChangeHandler = useCallback(
-        (fn: Function) => (e: React.ChangeEvent<HTMLInputElement>) => fn(e.currentTarget.value),
-        []
-    );
-
-    const handleSubmit = useCallback((e: React.FormEvent) => {
-        e.preventDefault();
-
-        createNewUser({ login, password, age });
-
-        setLogin('');
-        setPassword('');
-        setAge(0);
-    }, [login, password, age]);
+    const handleUserCreation = useCallback((values: UserFormValues) => {
+        createNewUser(values);
+        reset();
+    }, [reset]);
 
     return (
-        <form onSubmit={ handleSubmit }>
+        <form onSubmit={ handleSubmit(handleUserCreation) }>
             <input
+                ref={ register }
+                name='login'
                 placeholder='login'
-                value={ login }
-                onChange={ getChangeHandler(setLogin) }
             />
             <input
+                ref={ register }
+                name='password'
                 placeholder='password'
                 type='password'
-                value={ password }
-                onChange={ getChangeHandler(setPassword) }
             />
             <input
+                ref={ register }
+                name='age'
                 placeholder='age'
                 type='number'
-                value={ age }
-                onChange={ getChangeHandler(setAge) }
             />
             <button type='submit'>Create new user</button>
         </form>

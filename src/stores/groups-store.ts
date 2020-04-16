@@ -1,6 +1,6 @@
 import { createStore, createEffect, attach } from 'effector';
 
-import { GroupModel } from '../types/group-model';
+import { GroupModel, GroupFormValues, permissions } from '../types/group-model';
 
 import { $token } from './auth';
 
@@ -24,6 +24,35 @@ export const fetchGroups = attach({
         authToken: token
     })
 });
+
+export const createNewGroup = attach({
+    effect: createEffect<{ groupModel: Partial<GroupModel>, token: string }, GroupModel>({
+        async handler(data) {
+            const url = 'http://localhost:8080/groups';
+
+            const request = await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(data.groupModel),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-access-token': data.token
+                }
+            });
+
+            return request.json();
+        }
+    }),
+    source: $token,
+    mapParams: (group: GroupFormValues, token) => ({
+        token,
+        groupModel: {
+            name: group.name,
+            permissions: permissions.filter(p => group[p])
+        }
+    })
+});
+
+createNewGroup.done.watch(() => fetchGroups({}));
 
 /* Store */
 
