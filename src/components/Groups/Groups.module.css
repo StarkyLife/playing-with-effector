@@ -1,3 +1,22 @@
 .container {
     text-align: start;
 }
+
+.group {
+    font-size: 16px;
+}
+
+.hide {
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.remove {
+    margin-left: 10px;
+    color: red;
+    cursor: pointer;
+}
+
+.errorMessage {
+    color: red;
+}

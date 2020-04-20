@@ -59,9 +59,9 @@ export const createNewUser = attach({
 
 /* Store */
 
-export const $users = createStore<UserModel[]>([]);
-$users.on(getUsers.doneData, (_, users) => users);
-$users.on(createNewUser.doneData, (_, user) => [user])
+export const $users = createStore<UserModel[]>([])
+    .on(getUsers.doneData, (_, users) => users)
+    .on(createNewUser.doneData, (_, user) => [user]);
 
 /* Projections */
 

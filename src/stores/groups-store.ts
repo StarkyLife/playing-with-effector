@@ -1,10 +1,16 @@
-import { createStore, createEffect, attach } from 'effector';
+import { createStore, createEffect, attach, createEvent } from 'effector';
 
 import { GroupModel, GroupFormValues, permissions } from '../types/group-model';
 
 import { $token } from './auth';
 
+/* Events */
+
+export const hideGroup = createEvent<string>('hideGroup');
+
 /* Effects */
+
+// get groups
 
 export const fetchGroups = attach({
     effect: createEffect<{ authToken: string }, GroupModel[]>({
@@ -24,6 +30,8 @@ export const fetchGroups = attach({
         authToken: token
     })
 });
+
+// create group
 
 export const createNewGroup = attach({
     effect: createEffect<{ groupModel: Partial<GroupModel>, token: string }, GroupModel>({
@@ -54,10 +62,38 @@ export const createNewGroup = attach({
 
 createNewGroup.done.watch(() => fetchGroups({}));
 
+// delete group
+
+export const deleteGroup = attach({
+    effect: createEffect<{ id: string, token: string }, void>({
+        async handler(data) {
+            const url = `http://localhost:8080/groups/${data.id}`;
+
+            await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'x-access-token': data.token
+                }
+            });
+        }
+    }),
+    source: $token,
+    mapParams: (id: string, token) => ({
+        token,
+        id
+    })
+});
+
+deleteGroup.doneData.watch(() => fetchGroups({}));
+
 /* Store */
 
-export const $groups = createStore<GroupModel[]>([]);
-$groups.on(fetchGroups.doneData, (_, groups) => groups);
+export const $groups = createStore<GroupModel[]>([])
+    .on(fetchGroups.doneData, (_, groups) => groups)
+    .on(hideGroup, (groups, groupId) => groups.filter(g => g.id !== groupId));
+
+export const $groupsError = createStore<string>('')
+    .on(deleteGroup.failData, (_, error) => error.message);
 
 /* Projections */
 
